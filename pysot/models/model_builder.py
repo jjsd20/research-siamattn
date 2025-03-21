@@ -22,18 +22,19 @@ from pysot.models.head.detection import FCx2DetHead
 from pysot.utils.mask_target_builder import _build_proposal_target, _build_mask_target, _convert_loc_to_bbox
 
 
+
 class ModelBuilder(nn.Module):
     def __init__(self):
         super(ModelBuilder, self).__init__()
 
         # build backbone
         self.backbone = get_backbone(cfg.BACKBONE.TYPE,
-                                     **cfg.BACKBONE.KWARGS)
+                                     **cfg.BACKBONE.KWARGS)#resnet50提取特征[64, 256, 512, 1024, 2048]
 
         # build adjust layer
         if cfg.ADJUST.ADJUST:
             self.neck = get_neck(cfg.ADJUST.TYPE,
-                                 **cfg.ADJUST.KWARGS)
+                                 **cfg.ADJUST.KWARGS)#调整输出通道为[64,256,256,256,256]
 
         # build rpn head
         self.rpn_head = get_rpn_head(cfg.RPN.TYPE,
@@ -41,12 +42,12 @@ class ModelBuilder(nn.Module):
 
         # build mask head
         if cfg.MASK.MASK:
-            self.feature_enhance = FeatureEnhance(in_channels=256, out_channels=256)
+            self.feature_enhance = FeatureEnhance(in_channels=256, out_channels=256)  #注意力机制
             self.feature_fusion = FeatureFusionNeck(num_ins=5, fusion_level=1,
-                                                    in_channels=[64, 256, 256, 256, 256], conv_out_channels=256)
+                                                    in_channels=[64, 256, 256, 256, 256], conv_out_channels=256)#特征融合
             self.mask_head = FusedSemanticHead(pooling_func=None,
                                                num_convs=4, in_channels=256,
-                                               upsample_ratio=(cfg.MASK.MASK_OUTSIZE // cfg.TRAIN.ROIPOOL_OUTSIZE))
+                                               upsample_ratio=(cfg.MASK.MASK_OUTSIZE // cfg.TRAIN.ROIPOOL_OUTSIZE))#
             self.bbox_head = FCx2DetHead(pooling_func=None,
                                          in_channels=256 * (cfg.TRAIN.ROIPOOL_OUTSIZE // 4)**2)
 

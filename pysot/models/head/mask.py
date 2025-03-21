@@ -270,11 +270,11 @@ class FusedSemanticHead(nn.Module):
                  upsample_ratio=2,
                  num_classes=1):
         super(FusedSemanticHead, self).__init__()
-        self.num_convs = num_convs
-        self.in_channels = in_channels
-        self.conv_out_channels = conv_out_channels
-        self.upsample_ratio = upsample_ratio
-        self.num_classes = num_classes
+        self.num_convs = num_convs          #4
+        self.in_channels = in_channels#256
+        self.conv_out_channels = conv_out_channels#256
+        self.upsample_ratio = upsample_ratio#2
+        self.num_classes = num_classes#1
         self.pooling_func = pooling_func
 
         self.convs = nn.ModuleList()
@@ -293,13 +293,13 @@ class FusedSemanticHead(nn.Module):
             self.conv_out_channels,
             self.conv_out_channels,
             self.upsample_ratio,
-            stride=self.upsample_ratio)
+            stride=self.upsample_ratio)#转置卷积层
 
         self.roi_pool_m = DeformRoIPoolingPack(spatial_scale=1 / (cfg.TRAIN.SEARCH_SIZE / 63),
                                                out_size=cfg.TRAIN.ROIPOOL_OUTSIZE,
                                                out_channels=256,
                                                no_trans=False,
-                                               trans_std=0.1)
+                                               trans_std=0.1)#定义区域池化层
         '''
         self.roi_pool_m = ModulatedDeformRoIPoolingPack(spatial_scale=1 / (cfg.TRAIN.SEARCH_SIZE / 63),
                                                out_size=cfg.TRAIN.ROIPOOL_OUTSIZE,
@@ -331,3 +331,7 @@ class FusedSemanticHead(nn.Module):
         mask_pred = self.conv_logits(x)
 
         return mask_pred
+'''
+从输入的特征图中提取特定区域的特征，并应用一系列的卷积操作以学习这些特征。
+接着，它可能对特征图进行上采样以恢复原始的空间分辨率，然后通过一个 1x1 卷积层生成预测的掩码，模型预测目标在图像中的精确区域，而不仅仅是它的位置和类别
+'''

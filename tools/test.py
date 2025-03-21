@@ -30,8 +30,10 @@ parser.add_argument('--snapshot', default='', type=str,
         help='snapshot of models to eval')
 parser.add_argument('--video', default='', type=str,
         help='eval one special video')
-parser.add_argument('--vis', action='store_true',
-        help='whether visualzie result')
+# parser.add_argument('--vis', action='store_true',
+#         help='whether visualzie result')
+parser.add_argument('--vis', default=1, type=int,
+         help='whether visualzie result')
 args = parser.parse_args()
 
 torch.set_num_threads(1)
@@ -103,10 +105,10 @@ def main():
                 if idx == 0:
                     cv2.destroyAllWindows()
                 if args.vis and idx > frame_counter:
-                    cv2.polylines(img, [np.array(gt_bbox, np.int).reshape((-1, 1, 2))],
+                    cv2.polylines(img, [np.array(gt_bbox, np.int32).reshape((-1, 1, 2))],
                             True, (0, 255, 0), 3)
                     if cfg.MASK.MASK:
-                        cv2.polylines(img, [np.array(pred_bbox, np.int).reshape((-1, 1, 2))],
+                        cv2.polylines(img, [np.array(pred_bbox, np.int32).reshape((-1, 1, 2))],
                                 True, (0, 255, 255), 3)
                     else:
                         bbox = list(map(int, pred_bbox))

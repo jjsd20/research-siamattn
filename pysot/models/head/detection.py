@@ -8,17 +8,17 @@ class FCx2DetHead(nn.Module):
 
     def __init__(self, pooling_func, in_channels, fc_channels=512):
         super(FCx2DetHead, self).__init__()
-        self.in_chns = in_channels
+        self.in_chns = in_channels#4096
         self.tail_det = nn.Sequential(
             nn.Linear(in_channels, fc_channels),
             nn.ReLU(inplace=True),
             nn.Linear(fc_channels, fc_channels),
             nn.ReLU(inplace=True)
         )
-        self.tail_det_box = nn.Linear(fc_channels, 4)
+        self.tail_det_box = nn.Linear(fc_channels, 4)#预测bbox
         self.pooling_func = pooling_func
 
-        self.roi_pool_b = DeformRoIPoolingPack(spatial_scale=1 / (cfg.TRAIN.SEARCH_SIZE / 25),
+        self.roi_pool_b = DeformRoIPoolingPack(spatial_scale=1 / (cfg.TRAIN.SEARCH_SIZE / 25),#可变形池化
                                                out_size=cfg.TRAIN.ROIPOOL_OUTSIZE // 4,
                                                out_channels=256,
                                                no_trans=False,
